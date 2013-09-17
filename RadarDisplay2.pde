@@ -20,6 +20,8 @@ public class RadarDisplay2 implements Display {
   PVector tempVec = new PVector(0,0);
   boolean useGuides = true;
   PImage guideArrow;
+  
+  int sectorX, sectorY, sectorZ;
 
   public RadarDisplay2() {
     font = loadFont("HanzelExtendedNormal-48.vlw");
@@ -30,6 +32,13 @@ public class RadarDisplay2 implements Display {
       radarList[i].active = false;
     }
     guideArrow = loadImage("guideArrowLeft.png");
+    sectorX = sectorY = sectorZ = 0;
+  }
+
+  public void setSector(int x, int y, int z){
+    sectorX = x;
+    sectorY = y;
+    sectorZ = z;
   }
 
 
@@ -248,6 +257,8 @@ public class RadarDisplay2 implements Display {
       textFont(font, 15);
       text(targetted.statusText, 675, 100);
     }
+    text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")", 41,740);
+    
     drawGuides();
   }
 

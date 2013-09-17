@@ -365,6 +365,10 @@ void oscEvent(OscMessage theOscMessage) {
     int[] disks = { theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue() };
     println(disks);
     bootDisplay.setDisks(disks);
+  } else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ){
+    radarDisplay.setSector(   theOscMessage.get(0).intValue(), 
+                              theOscMessage.get(1).intValue(), 
+                              theOscMessage.get(2).intValue());
   } else {
     //displayList[currentDisplay].oscMessage(theOscMessage);
     currentScreen.oscMessage(theOscMessage);
