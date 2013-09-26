@@ -46,7 +46,12 @@ public class RadarDisplay2 implements Display {
   }
   public void stop() {
   }
-
+  
+  //FFUUU P2
+  public float heading(float x, float y) {
+    float angle = (float) Math.atan2(-y, x);
+    return -1*angle;
+  }
 
   public void draw() {
     background(0, 0, 0);
@@ -218,7 +223,7 @@ public class RadarDisplay2 implements Display {
       useGuides = true;
       tempVec.x = targetted.position.x;
       tempVec.y = targetted.position.z;
-      float yRotation = (270 + degrees(tempVec.heading()) )% 360;
+      float yRotation = (270 + degrees(heading(tempVec.x, tempVec.y)) )% 360;
       if(yRotation > 0 && yRotation < 180){  //right hand side of ship
         guideVector.x = -map(yRotation, 0, 180, 0, 1);
       } else {
@@ -227,7 +232,7 @@ public class RadarDisplay2 implements Display {
       tempVec.x = targetted.position.z;
       tempVec.y = targetted.position.y;
       
-      float xRotation =  degrees(tempVec.heading());
+      float xRotation =  degrees(heading(tempVec.x, tempVec.y));
       if(xRotation > -90 && xRotation < 0){
         guideVector.y = -map(xRotation, -90, 0, 1,0);
       } else if (xRotation < 90 && xRotation > 0){
