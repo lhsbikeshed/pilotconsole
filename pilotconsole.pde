@@ -15,7 +15,7 @@ boolean testMode = true;
 
 //leave this alone
 String serverIP = "127.0.0.1";    
-boolean joystickTestMode = true;
+boolean joystickTestMode = false;
 
 
 
