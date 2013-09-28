@@ -32,7 +32,7 @@ public class Joystick {
 //Dean Camera LUFA Joystick wFFB
      //device = controll.getDevice("Dean Camera LUFA Joystick wFFB");
 
-      device = controll.getDevice("LUFA Joystick wFFB");
+      device = controll.getDevice("T.Flight Stick X");
       device.setTolerance(0.05f);
 
       ControllSlider sliderX = device.getSlider("X Axis");
@@ -47,7 +47,7 @@ public class Joystick {
       rotThrottleStick = new ControllStick(sliderR, sliderT);
       rotThrottleStick.setTolerance(0.2);
 
-      cooliehat = device.getCoolieHat(16);
+      cooliehat = device.getCoolieHat(12);
     }
   }
 
