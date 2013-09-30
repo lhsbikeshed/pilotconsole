@@ -146,7 +146,8 @@ public class RadarDisplay2 implements Display {
           fill(0, 50, 0);
           strokeWeight(1);
 
-          ellipse(0, 0, 20, 20);
+         // ellipse(0, 0, 20, 20);
+         rect(-10,10,20,20);
           popMatrix();
 
           //sphere and text
