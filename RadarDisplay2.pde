@@ -20,6 +20,8 @@ public class RadarDisplay2 implements Display {
   PVector tempVec = new PVector(0,0);
   boolean useGuides = true;
   PImage guideArrow;
+  
+  int sectorX, sectorY, sectorZ;
 
   public RadarDisplay2() {
     font = loadFont("HanzelExtendedNormal-48.vlw");
@@ -30,6 +32,13 @@ public class RadarDisplay2 implements Display {
       radarList[i].active = false;
     }
     guideArrow = loadImage("guideArrowLeft.png");
+    sectorX = sectorY = sectorZ = 0;
+  }
+
+  public void setSector(int x, int y, int z){
+    sectorX = x;
+    sectorY = y;
+    sectorZ = z;
   }
 
 
@@ -37,7 +46,12 @@ public class RadarDisplay2 implements Display {
   }
   public void stop() {
   }
-
+  
+  //FFUUU P2
+  public float heading(float x, float y) {
+    float angle = (float) Math.atan2(-y, x);
+    return -1*angle;
+  }
 
   public void draw() {
     background(0, 0, 0);
@@ -132,7 +146,8 @@ public class RadarDisplay2 implements Display {
           fill(0, 50, 0);
           strokeWeight(1);
 
-          ellipse(0, 0, 20, 20);
+         // ellipse(0, 0, 20, 20);
+         rect(-10,10,20,20);
           popMatrix();
 
           //sphere and text
@@ -209,7 +224,7 @@ public class RadarDisplay2 implements Display {
       useGuides = true;
       tempVec.x = targetted.position.x;
       tempVec.y = targetted.position.z;
-      float yRotation = (270 + degrees(tempVec.heading()) )% 360;
+      float yRotation = (270 + degrees(heading(tempVec.x, tempVec.y)) )% 360;
       if(yRotation > 0 && yRotation < 180){  //right hand side of ship
         guideVector.x = -map(yRotation, 0, 180, 0, 1);
       } else {
@@ -218,7 +233,7 @@ public class RadarDisplay2 implements Display {
       tempVec.x = targetted.position.z;
       tempVec.y = targetted.position.y;
       
-      float xRotation =  degrees(tempVec.heading());
+      float xRotation =  degrees(heading(tempVec.x, tempVec.y));
       if(xRotation > -90 && xRotation < 0){
         guideVector.y = -map(xRotation, -90, 0, 1,0);
       } else if (xRotation < 90 && xRotation > 0){
@@ -248,6 +263,8 @@ public class RadarDisplay2 implements Display {
       textFont(font, 15);
       text(targetted.statusText, 675, 100);
     }
+    text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")", 41,740);
+    
     drawGuides();
   }
 

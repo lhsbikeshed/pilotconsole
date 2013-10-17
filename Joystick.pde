@@ -39,7 +39,9 @@ public class Joystick {
       ControllSlider sliderY = device.getSlider("Y Axis");
     //"Z Rotation
       ControllSlider sliderR = device.getSlider("Z Rotation");
-      ControllSlider sliderT = device.getSlider(0);
+
+      ControllSlider sliderT = device.getSlider(2);
+
 
 
       xyStick = new ControllStick(sliderX, sliderY);
