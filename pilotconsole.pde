@@ -88,12 +88,13 @@ void setup() {
     serverIP = "10.0.0.100";
     joystickTestMode = false;
     shipState.poweredOn = false;
+    frame.setLocation(0,0);
   }
 
 
   size(1024, 768, P3D);
   frameRate(25);
-  serialPort = new Serial(this, "COM37", 115200);
+  serialPort = new Serial(this, "COM4", 115200);
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress(serverIP, 12000);
   dropDisplay = new DropDisplay();
