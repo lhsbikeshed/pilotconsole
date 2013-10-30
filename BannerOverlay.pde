@@ -17,8 +17,8 @@ public class BannerOverlay {
 
   private int iconIndex = 0;
   private PImage[] icons = new PImage[1];
-  String pathBase = "C:/Users/tom/Documents/sketch/bannertest/data/";
-  //String pathBase = "/home/pilot/game/testing/pilotconsole/data/";    //LIVE
+  //String pathBase = "C:/Users/tom/Documents/sketch/bannertest/data/";
+  String pathBase = "c:/game/dev/pilotconsole/data/";    //LIVE
 
 
 
