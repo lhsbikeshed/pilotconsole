@@ -7,7 +7,7 @@ import netP5.*;
 import java.util.Hashtable;
 
 //CHANGE ME
-boolean testMode = true;
+boolean testMode = false;
 
 
 
@@ -88,7 +88,7 @@ void setup() {
     serverIP = "10.0.0.100";
     joystickTestMode = false;
     shipState.poweredOn = false;
-    frame.setLocation(0,0);
+    frame.setLocation(0, 0);
   }
 
 
@@ -178,7 +178,6 @@ void draw() {
       //displayList[currentDisplay].draw();
 
       currentScreen.draw();
-      
     } 
     else {
       if (shipState.poweringOn) {
@@ -235,21 +234,20 @@ void oscEvent(OscMessage theOscMessage) {
     int state = theOscMessage.get(0).intValue();
     String flags = theOscMessage.get(1).stringValue();
     String[] fList = flags.split(";");
-     //reset flags
+    //reset flags
     bootDisplay.brokenBoot = false;
-    for (String f : fList){
-      if(f.equals("BROKENBOOT")){
+    for (String f : fList) {
+      if (f.equals("BROKENBOOT")) {
         println("BROKEN BOOT");
         bootDisplay.brokenBoot = true;
       }
     }
-    
+
     if (state == 0) {
       shipState.poweredOn = false;
       shipState.poweringOn = false;
       bootDisplay.stop();
       bannerSystem.cancel();
-      
     } 
     else {
 
@@ -257,7 +255,6 @@ void oscEvent(OscMessage theOscMessage) {
       if (!shipState.poweredOn ) {
         shipState.poweringOn = true;
         changeDisplay(bootDisplay);
-        
       }
     }
   } 
@@ -296,12 +293,13 @@ void oscEvent(OscMessage theOscMessage) {
     boolean state = theOscMessage.get(0).intValue() == 0 ? true : false;
     joy.setEnabled (state);
     println("Set control state : " + state);
-    if(state == false){
+    if (state == false) {
       bannerSystem.setSize(700, 200);
       bannerSystem.setTitle("NOTICE");
       bannerSystem.setText("AUTOPILOT ENGAGED\r\n CONTROLS DISABLED");
       bannerSystem.displayFor(36000000);
-    } else {
+    } 
+    else {
       bannerSystem.cancel();
     }
   }
@@ -311,6 +309,8 @@ void oscEvent(OscMessage theOscMessage) {
       shipState.poweredOn = true;
       shipState.poweringOn = false;
       bootDisplay.stop();
+      OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
+      oscP5.send(myMessage, myRemoteLocation);
     } 
     else {
       shipState.poweredOn = false;
@@ -361,16 +361,21 @@ void oscEvent(OscMessage theOscMessage) {
     bannerSystem.setTitle(title);
     bannerSystem.setText(text);
     bannerSystem.displayFor(duration);
-  } else if (theOscMessage.checkAddrPattern("/system/boot/diskNumbers") ){
-    
-    int[] disks = { theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue() };
+  } 
+  else if (theOscMessage.checkAddrPattern("/system/boot/diskNumbers") ) {
+
+    int[] disks = { 
+      theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue()
+    };
     println(disks);
     bootDisplay.setDisks(disks);
-  } else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ){
+  } 
+  else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ) {
     radarDisplay.setSector(   theOscMessage.get(0).intValue(), 
-                              theOscMessage.get(1).intValue(), 
-                              theOscMessage.get(2).intValue());
-  } else {
+    theOscMessage.get(1).intValue(), 
+    theOscMessage.get(2).intValue());
+  } 
+  else {
     //displayList[currentDisplay].oscMessage(theOscMessage);
     currentScreen.oscMessage(theOscMessage);
   }
@@ -432,7 +437,6 @@ public class ShipState {
   public void resetState() {
   }
 }
-
 
 
 
