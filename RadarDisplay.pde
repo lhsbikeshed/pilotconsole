@@ -264,7 +264,6 @@ public void serialEvent(String evt){
         }
         if (r == null) {
           r = new RadarObject();
-          
         }
 
         r.id = id;

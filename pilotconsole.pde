@@ -1,3 +1,8 @@
+import ddf.minim.*;
+import ddf.minim.signals.*;
+import ddf.minim.analysis.*;
+import ddf.minim.effects.*;
+
 import processing.serial.*;
 
 import java.awt.Point;
@@ -13,29 +18,29 @@ boolean testMode = true;
 
 
 
-//leave this alone
+//DONT EDIT BELOW HERE -----------------
 String serverIP = "127.0.0.1";    
 boolean joystickTestMode = true;
 
 
+//---- audio stuff
+Minim minim;
+ConsoleAudio consoleAudio;
 
-
-//--------------------------
+//-----OSC stuff--------
 OscP5 oscP5;
+NetAddress myRemoteLocation;
 
-DropDisplay dropDisplay;
-WarpDisplay warpDisplay;
-RadarDisplay2 radarDisplay;
-BootDisplay bootDisplay;
-LaunchDisplay launchDisplay;
 
+//---joystick class
 Joystick joy;
 
-long deathTime = 0;
 
-ShipState shipState = new ShipState();
+long deathTime = 0;  //what time did we die?
 
-PFont font;
+ShipState shipState = new ShipState();  //container for ship data
+
+PFont font;  //default font for game
 
 
 
@@ -43,7 +48,9 @@ PFont font;
 Serial serialPort;
 String serialBuffer = "";
 String lastSerial = "";
-NetAddress myRemoteLocation;
+
+
+// mappings from physical buttons to OSC messages
 String[] messageMapping = {  
   "/system/jump/state", 
   "/system/propulsion/state", 
@@ -54,9 +61,16 @@ String[] messageMapping = {
 };
 
 
-//display handling
+//-----displays-----
 Hashtable<String, Display> displayMap = new Hashtable<String, Display>();
 Display currentScreen;
+DropDisplay dropDisplay;
+WarpDisplay warpDisplay;
+RadarDisplay2 radarDisplay;
+BootDisplay bootDisplay;
+LaunchDisplay launchDisplay;
+
+//---banner overlay class---
 BannerOverlay bannerSystem = new BannerOverlay();
 
 
@@ -64,19 +78,12 @@ BannerOverlay bannerSystem = new BannerOverlay();
 int systemPower = 2;
 long heartBeatTimer = -1;
 
-
+//---- damage things----
 int damageTimer = -1000;
 PImage noiseImage;
 
 float lastOscTime = 0;
 
-
-/* scene to display mapping
- * 0 -> launch -> launchdisplay
- * 1 -> warp -> warpDisplay
- * 2 -> drop -> DropScene
- * 3 -> debriswar -> radardisplay
- */
 void setup() {
 
   if (testMode) {
@@ -88,13 +95,13 @@ void setup() {
     serverIP = "10.0.0.100";
     joystickTestMode = false;
     shipState.poweredOn = false;
-    frame.setLocation(0,0);
+    frame.setLocation(0, 0);
+    serialPort = new Serial(this, "COM4", 115200);
   }
 
 
   size(1024, 768, P3D);
   frameRate(25);
-  serialPort = new Serial(this, "COM4", 115200);
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress(serverIP, 12000);
   dropDisplay = new DropDisplay();
@@ -104,12 +111,7 @@ void setup() {
 
   joy = new Joystick(oscP5, this, joystickTestMode);
 
-  /* displayList[0] = launchDisplay;
-   displayList[1] = warpDisplay;
-   displayList[2] = dropDisplay;
-   displayList[3] = radarDisplay;*/
 
-  //TEST
   displayMap.put("radar", radarDisplay);
   displayMap.put("drop", dropDisplay);
   displayMap.put("docking", launchDisplay);
@@ -128,6 +130,12 @@ void setup() {
   noiseImage = loadImage("noise.png");
   setJumpLightState(false);
 
+  //SOUND!
+  minim = new Minim(this);
+  consoleAudio = new ConsoleAudio(minim);
+  //consoleAudio.playClip("bannerPopup");
+            consoleAudio.playClip("newTarget");
+
   /*sync to current game screen*/
   OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
   oscP5.send(myMessage, myRemoteLocation);
@@ -145,15 +153,17 @@ void draw() {
   noSmooth();
   float s = shipState.shipVel.mag();
   shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - lastOscTime) / 250.0f);
-  while (serialPort.available () > 0) {
-    char val = serialPort.readChar();
-    if (val == ',') {
-      //get first char
-      dealWithSerial(serialBuffer);
-      serialBuffer = "";
-    } 
-    else {
-      serialBuffer += val;
+  if (!testMode) {
+    while (serialPort.available () > 0) {
+      char val = serialPort.readChar();
+      if (val == ',') {
+        //get first char
+        dealWithSerial(serialBuffer);
+        serialBuffer = "";
+      } 
+      else {
+        serialBuffer += val;
+      }
     }
   }
 
@@ -178,7 +188,6 @@ void draw() {
       //displayList[currentDisplay].draw();
 
       currentScreen.draw();
-      
     } 
     else {
       if (shipState.poweringOn) {
@@ -235,21 +244,20 @@ void oscEvent(OscMessage theOscMessage) {
     int state = theOscMessage.get(0).intValue();
     String flags = theOscMessage.get(1).stringValue();
     String[] fList = flags.split(";");
-     //reset flags
+    //reset flags
     bootDisplay.brokenBoot = false;
-    for (String f : fList){
-      if(f.equals("BROKENBOOT")){
+    for (String f : fList) {
+      if (f.equals("BROKENBOOT")) {
         println("BROKEN BOOT");
         bootDisplay.brokenBoot = true;
       }
     }
-    
+
     if (state == 0) {
       shipState.poweredOn = false;
       shipState.poweringOn = false;
       bootDisplay.stop();
       bannerSystem.cancel();
-      
     } 
     else {
 
@@ -257,7 +265,6 @@ void oscEvent(OscMessage theOscMessage) {
       if (!shipState.poweredOn ) {
         shipState.poweringOn = true;
         changeDisplay(bootDisplay);
-        
       }
     }
   } 
@@ -296,12 +303,13 @@ void oscEvent(OscMessage theOscMessage) {
     boolean state = theOscMessage.get(0).intValue() == 0 ? true : false;
     joy.setEnabled (state);
     println("Set control state : " + state);
-    if(state == false){
+    if (state == false) {
       bannerSystem.setSize(700, 200);
       bannerSystem.setTitle("NOTICE");
       bannerSystem.setText("AUTOPILOT ENGAGED\r\n CONTROLS DISABLED");
       bannerSystem.displayFor(36000000);
-    } else {
+    } 
+    else {
       bannerSystem.cancel();
     }
   }
@@ -361,16 +369,21 @@ void oscEvent(OscMessage theOscMessage) {
     bannerSystem.setTitle(title);
     bannerSystem.setText(text);
     bannerSystem.displayFor(duration);
-  } else if (theOscMessage.checkAddrPattern("/system/boot/diskNumbers") ){
-    
-    int[] disks = { theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue() };
-    println(disks);
+  } 
+  else if (theOscMessage.checkAddrPattern("/system/boot/diskNumbers") ) {
+
+    int[] disks = { 
+      theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue()
+      };
+      println(disks);
     bootDisplay.setDisks(disks);
-  } else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ){
+  } 
+  else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ) {
     radarDisplay.setSector(   theOscMessage.get(0).intValue(), 
-                              theOscMessage.get(1).intValue(), 
-                              theOscMessage.get(2).intValue());
-  } else {
+    theOscMessage.get(1).intValue(), 
+    theOscMessage.get(2).intValue());
+  } 
+  else {
     //displayList[currentDisplay].oscMessage(theOscMessage);
     currentScreen.oscMessage(theOscMessage);
   }
@@ -432,7 +445,4 @@ public class ShipState {
   public void resetState() {
   }
 }
-
-
-
 

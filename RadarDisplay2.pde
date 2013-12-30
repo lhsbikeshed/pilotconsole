@@ -17,10 +17,10 @@ public class RadarDisplay2 implements Display {
 
   //screen space 2d vector representing the direction the pilot should fly to get to the targetted object
   PVector guideVector = new PVector(0, 0);
-  PVector tempVec = new PVector(0,0);
+  PVector tempVec = new PVector(0, 0);
   boolean useGuides = true;
   PImage guideArrow;
-  
+
   int sectorX, sectorY, sectorZ;
 
   public RadarDisplay2() {
@@ -35,7 +35,7 @@ public class RadarDisplay2 implements Display {
     sectorX = sectorY = sectorZ = 0;
   }
 
-  public void setSector(int x, int y, int z){
+  public void setSector(int x, int y, int z) {
     sectorX = x;
     sectorY = y;
     sectorZ = z;
@@ -46,7 +46,7 @@ public class RadarDisplay2 implements Display {
   }
   public void stop() {
   }
-  
+
   //FFUUU P2
   public float heading(float x, float y) {
     float angle = (float) Math.atan2(-y, x);
@@ -68,7 +68,7 @@ public class RadarDisplay2 implements Display {
       return ;
     }
     pushMatrix();
-    
+
     //left is at 28,326
     if (guideVector.x < 0) {
       tint(255, 255, 255, (int)map(abs(guideVector.x), 0, 1, 0, 255));
@@ -146,8 +146,8 @@ public class RadarDisplay2 implements Display {
           fill(0, 50, 0);
           strokeWeight(1);
 
-         // ellipse(0, 0, 20, 20);
-         rect(-10,10,20,20);
+          // ellipse(0, 0, 20, 20);
+          rect(-10, 10, 20, 20);
           popMatrix();
 
           //sphere and text
@@ -199,7 +199,7 @@ public class RadarDisplay2 implements Display {
           // text(r.statusText,r.screenPos.x + 5, r.screenPos.y + 20);
 
           if (rItem.targetted) {
-            
+
             targetted = radarList[i];
             noFill();
             stroke(255, 255, 0);
@@ -220,27 +220,29 @@ public class RadarDisplay2 implements Display {
     //turn on pilot guides if we have a highlighted target
     //turn off if not
     //
-    if(targetted != null){
+    if (targetted != null) {
       useGuides = true;
       tempVec.x = targetted.position.x;
       tempVec.y = targetted.position.z;
       float yRotation = (270 + degrees(heading(tempVec.x, tempVec.y)) )% 360;
-      if(yRotation > 0 && yRotation < 180){  //right hand side of ship
+      if (yRotation > 0 && yRotation < 180) {  //right hand side of ship
         guideVector.x = -map(yRotation, 0, 180, 0, 1);
-      } else {
+      } 
+      else {
         guideVector.x = -map(yRotation, 180, 360, -1, 0);
       }
       tempVec.x = targetted.position.z;
       tempVec.y = targetted.position.y;
-      
+
       float xRotation =  degrees(heading(tempVec.x, tempVec.y));
-      if(xRotation > -90 && xRotation < 0){
-        guideVector.y = -map(xRotation, -90, 0, 1,0);
-      } else if (xRotation < 90 && xRotation > 0){
+      if (xRotation > -90 && xRotation < 0) {
+        guideVector.y = -map(xRotation, -90, 0, 1, 0);
+      } 
+      else if (xRotation < 90 && xRotation > 0) {
         guideVector.y = -map(xRotation, 90, 0, -1, 0);
       }
-      
-    } else {
+    } 
+    else {
       useGuides = false;
     }
 
@@ -263,8 +265,8 @@ public class RadarDisplay2 implements Display {
       textFont(font, 15);
       text(targetted.statusText, 675, 100);
     }
-    text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")", 41,740);
-    
+    text("Sector (" + sectorX + "," + sectorY + "," + sectorZ + ")", 41, 740);
+
     drawGuides();
   }
 
@@ -357,6 +359,13 @@ public class RadarDisplay2 implements Display {
         if (rId == -1) {
           rId = getNewRadarItem();
           println("new item : " + rId + " - " + id);
+          if(theOscMessage.get(1).stringValue().equals("INCOMING DEBRIS")){
+            consoleAudio.playClip("collisionAlert");
+          } else {
+            
+            consoleAudio.playClip("newTarget");
+          }
+          
           newItem = true;
         }        
 
