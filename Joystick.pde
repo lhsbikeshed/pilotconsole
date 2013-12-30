@@ -96,7 +96,7 @@ public class Joystick {
 
         myMessage.add(cooliehat.getX());
         myMessage.add(cooliehat.getY());
-        println(cooliehat.getX());
+        //println(cooliehat.getX());
         //myMessage.add(map(rotThrottleStick.getY(), -1.0, 1.0, 1.0, 0.0));
         myMessage.add(throttle);
       }

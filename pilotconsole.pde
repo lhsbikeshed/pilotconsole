@@ -134,7 +134,7 @@ void setup() {
   minim = new Minim(this);
   consoleAudio = new ConsoleAudio(minim);
   //consoleAudio.playClip("bannerPopup");
-            consoleAudio.playClip("newTarget");
+  consoleAudio.playClip("newTarget");
 
   /*sync to current game screen*/
   OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
@@ -319,6 +319,8 @@ void oscEvent(OscMessage theOscMessage) {
       shipState.poweredOn = true;
       shipState.poweringOn = false;
       bootDisplay.stop();
+      OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
+      oscP5.send(myMessage, myRemoteLocation);
     } 
     else {
       shipState.poweredOn = false;
@@ -376,6 +378,7 @@ void oscEvent(OscMessage theOscMessage) {
       theOscMessage.get(0).intValue(), theOscMessage.get(1).intValue(), theOscMessage.get(2).intValue()
       };
       println(disks);
+
     bootDisplay.setDisks(disks);
   } 
   else if (theOscMessage.checkAddrPattern("/ship/sectorChanged") ) {
