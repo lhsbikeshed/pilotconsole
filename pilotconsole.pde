@@ -65,7 +65,7 @@ String[] messageMapping = {
 Hashtable<String, Display> displayMap = new Hashtable<String, Display>();
 Display currentScreen;
 DropDisplay dropDisplay;
-WarpDisplay warpDisplay;
+WarpDisplay2 warpDisplay;
 RadarDisplay2 radarDisplay;
 BootDisplay bootDisplay;
 LaunchDisplay launchDisplay;
@@ -85,7 +85,8 @@ PImage noiseImage;
 float lastOscTime = 0;
 
 void setup() {
-
+  size(1024, 768, P3D);
+  frameRate(25);
   if (testMode) {
     serverIP = "127.0.0.1";    
     joystickTestMode = true;
@@ -100,13 +101,12 @@ void setup() {
   }
 
 
-  size(1024, 768, P3D);
-  frameRate(25);
+  
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress(serverIP, 12000);
   dropDisplay = new DropDisplay();
   radarDisplay = new RadarDisplay2();
-  warpDisplay = new WarpDisplay();
+  warpDisplay = new WarpDisplay2();
   launchDisplay = new LaunchDisplay();
 
   joy = new Joystick(oscP5, this, joystickTestMode);
@@ -134,7 +134,7 @@ void setup() {
   minim = new Minim(this);
   consoleAudio = new ConsoleAudio(minim);
   //consoleAudio.playClip("bannerPopup");
-  consoleAudio.playClip("newTarget");
+  //consoleAudio.playClip("newTarget");
 
   /*sync to current game screen*/
   OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
@@ -152,7 +152,7 @@ void changeDisplay(Display d) {
 void draw() {
   noSmooth();
   float s = shipState.shipVel.mag();
-  shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - lastOscTime) / 250.0f);
+  shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - shipState.lastVelocityUpdate) / 250.0f);
   if (!testMode) {
     while (serialPort.available () > 0) {
       char val = serialPort.readChar();
@@ -349,6 +349,7 @@ void oscEvent(OscMessage theOscMessage) {
     shipState.shipVel.z = theOscMessage.get(8).floatValue();
 
     shipState.lastShipVel = shipState.shipVelocity;
+    shipState.lastVelocityUpdate = millis();
   } 
   else if ( theOscMessage.checkAddrPattern("/clientscreen/PilotStation/changeTo") ) {
     String changeTo = theOscMessage.get(0).stringValue();
@@ -441,6 +442,8 @@ public class ShipState {
 
   public float shipVelocity = 0;
   public float lastShipVel = 0;
+  
+  public long lastVelocityUpdate = 0;
 
   public ShipState() {
   };

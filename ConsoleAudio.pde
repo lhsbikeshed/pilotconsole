@@ -20,8 +20,8 @@ public class ConsoleAudio {
       if(parts.length == 2 && !parts[0].startsWith("#")){
         println("loading: " + parts[1]);
         AudioPlayer s = minim.loadFile("audio/" + parts[1], 512);
-        //move to right channel
-        s.setPan(1.0f);
+        //move to left channel
+        s.setPan(-1.0f);
         audioList.put(parts[0], s);
         println(s.getControls());
       }
@@ -32,7 +32,7 @@ public class ConsoleAudio {
   public void playClip(String name) {
     AudioPlayer c = audioList.get(name);
     if(c != null){
-      c.setPan(1.0f);
+      c.setPan(-1.0f);
       c.rewind();
       c.play();
     } else {
