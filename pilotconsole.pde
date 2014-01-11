@@ -12,7 +12,7 @@ import netP5.*;
 import java.util.Hashtable;
 
 //CHANGE ME
-boolean testMode = true;
+boolean testMode = false;
 
 
 
@@ -197,6 +197,7 @@ void draw() {
           shipState.poweringOn = false;
           /* sync current display to server */
           OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
+          oscP5.send(myMessage, new NetAddress(serverIP, 12000));
           oscP5.send(myMessage, new NetAddress(serverIP, 12000));
         }
       }
