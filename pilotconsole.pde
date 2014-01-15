@@ -10,6 +10,8 @@ import oscP5.*;
 import netP5.*;
 
 import java.util.Hashtable;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 //CHANGE ME
 boolean testMode = false;
@@ -87,6 +89,7 @@ float lastOscTime = 0;
 void setup() {
   size(1024, 768, P3D);
   frameRate(25);
+  hideCursor();
   if (testMode) {
     serverIP = "127.0.0.1";    
     joystickTestMode = true;
@@ -427,7 +430,12 @@ void dealWithSerial(String vals) {
 void mouseClicked() {
   println (":" + mouseX + "," + mouseY);
 }
-
+void hideCursor(){
+  BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+  Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
+  cursorImg, new Point(0, 0), "blank cursor");
+  frame.setCursor(blankCursor);
+}
 
 public class ShipState {
 
