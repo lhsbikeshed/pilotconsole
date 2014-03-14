@@ -11,7 +11,7 @@ public interface Display {
 
 public class DropDisplay implements Display {
 
-  PImage bg, structFailOverlay, fireballImg;
+  PImage bg, structFailOverlay, fireballImg, turbulenceImg;
   PFont font;
 
   Point[] labelPos = new Point[6];
@@ -23,13 +23,14 @@ public class DropDisplay implements Display {
   boolean structFail = false;
   
   PVector fireVec = new PVector(0,0,0);
-  
+  long turbulenceTime = 0;
   
   public DropDisplay() {
     bg = loadImage("reentry.png");
     font = loadFont("HanzelExtendedNormal-48.vlw");
     structFailOverlay = loadImage("structuralFailure.png");
     fireballImg = loadImage("fireball.png");
+    turbulenceImg = loadImage("turbulence.png");
 
     labelPos[0] = new Point(217, 307);
     labelPos[1] = new Point(345, 563);
@@ -132,6 +133,13 @@ public class DropDisplay implements Display {
       popMatrix();
     }
     noTint();
+    
+    if(turbulenceTime < millis() && millis() < turbulenceTime + 1500){
+      
+        image(turbulenceImg, 155, 410);
+      
+    }
+    
     if (structFail) { //show the "structural failure" warning
      
       image(structFailOverlay, 128, 200);
@@ -153,6 +161,8 @@ public class DropDisplay implements Display {
       println(fireVec.z);
     } else if (theOscMessage.checkAddrPattern("/scene/drop/structuralFailure")==true) {
       structFail = true;
+    } else if (theOscMessage.checkAddrPattern("/scene/drop/turbulenceWarning")){
+      turbulenceTime = millis();
     }
   }
   
