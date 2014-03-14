@@ -163,6 +163,7 @@ public class DropDisplay implements Display {
       structFail = true;
     } else if (theOscMessage.checkAddrPattern("/scene/drop/turbulenceWarning")){
       turbulenceTime = millis();
+      consoleAudio.playClip("bannerPopup");
     }
   }
   
