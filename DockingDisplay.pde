@@ -9,7 +9,14 @@ public class DockingDisplay implements Display {
   boolean clamped = true;
   boolean bayGravity = true;
   
-  boolean lockedToBeacon = false;
+  
+  public static final int NO_SIGNAL = 0;
+  public static final int BEACON_LOCKING = 1;
+  public static final int BEACON_LOCKED = 2;
+  int lockingState = NO_SIGNAL;
+  
+  boolean speedWarning = false;
+  long lastSpeedWarning = 0;
   
   
   int undercarriageState = 1;
@@ -53,23 +60,37 @@ public class DockingDisplay implements Display {
       lastShipPos.x = shipPos.x; 
       lastShipPos.y = shipPos.y; 
       lastShipPos.z = shipPos.z;
-      lastPosUpdate = millis();
+      
       distance = theOscMessage.get(4).floatValue(); 
-      lockedToBeacon = theOscMessage.get(5).intValue() == 1 ? true : false ;
-      //  lastRotation = shipRot.z;
-
+      
+      
+      lastPosUpdate = millis();
 
       shipPos.x = theOscMessage.get(0).floatValue();
       shipPos.y = theOscMessage.get(1).floatValue();
       shipPos.z = theOscMessage.get(2).floatValue();
-      // shipRot.x = theOscMessage.get(3).floatValue();
-      //shipRot.y = theOscMessage.get(4).floatValue();
-      //shipRot.z = theOscMessage.get(5).floatValue();
+      
+      //signal locking events
+      int newLockingState = theOscMessage.get(5).intValue() ;
+      if(lockingState != newLockingState){
+        if(newLockingState == NO_SIGNAL){
+          consoleAudio.playClip("signalLost");
+        } else if (newLockingState == BEACON_LOCKING){
+          consoleAudio.playClip("searchingBeacon");
+        } else if( newLockingState == BEACON_LOCKED){
+          consoleAudio.playClip("signalAcquire");
+        }
+      }
+      
+      lockingState = newLockingState;
+      
     }
   }
 
 
   public void start() {
+    lockingState = NO_SIGNAL;
+    
   }
   public void stop()
   {
@@ -99,45 +120,73 @@ public class DockingDisplay implements Display {
       ellipse(width/2, height/2, i * 150, i * 150);
     }
 
-    pushMatrix();
-
-    PVector lerpPos = new PVector(0, 0, 0);
-    lerpPos.x = lerp(lastShipPos.x, shipPos.x, (millis() - lastPosUpdate) / 200.0f);
-    lerpPos.y = lerp(lastShipPos.y, shipPos.y, (millis() - lastPosUpdate) / 200.0f);
-
-    int screenX = (int)map(lerpPos.x, -4.0, 4.0, 0, width);
-    int screenY = (int)map(lerpPos.y, -4.0, 4.0, 0, height);
-
-
-    translate(screenX, screenY);
-    //ship
-    strokeWeight(5);
-    noFill();
-
-    //calc colour
-    float d = abs(lerpPos.mag());
-    if ( d < 0.5) {
-      stroke(0, 255, 0);
-    } 
-    else if (d < 1.5) {
-      stroke(255, 255, 0);
-    } 
-    else {
-      stroke(255, 0, 0);
+      if(lockingState != NO_SIGNAL){
+      pushMatrix();
+  
+      PVector lerpPos = new PVector(0, 0, 0);
+      lerpPos.x = lerp(lastShipPos.x, shipPos.x, (millis() - lastPosUpdate) / 200.0f);
+      lerpPos.y = lerp(lastShipPos.y, shipPos.y, (millis() - lastPosUpdate) / 200.0f);
+  
+      int screenX = (int)map(lerpPos.x, 4.0, -4.0, 0, width);
+      int screenY = (int)map(lerpPos.y, 4.0, -4.0, 0, height);
+  
+  
+      translate(screenX, screenY);
+      //ship
+      strokeWeight(5);
+      noFill();
+  
+      //calc colour
+      float d = abs(lerpPos.mag());
+      if ( d < 0.5) {
+        stroke(0, 255, 0);
+      } 
+      else if (d < 1.5) {
+        stroke(255, 255, 0);
+      } 
+      else {
+        stroke(255, 0, 0);
+      }
+      ellipse(0, 0, 100, 100);
+      strokeWeight(2);
+      line(-50, -50, 50, 50);
+      line(-50, 50, 50, -50);
+  
+  
+      popMatrix();
+    } else {
+      textFont(font, 48);
+      text("NO SIGNAL", 322, 401);
     }
-    ellipse(0, 0, 100, 100);
-    line(-50, -50, 50, 50);
-    line(-50, 50, 50, -50);
-
-
-    popMatrix();
     textFont(font, 30);
     text(distance, 46, 740);
-    String s = "locking onto beacon..";
-    if(lockedToBeacon){
+    text("Speed: " + (int)shipState.shipVelocity, 58, 183);
+  
+    String s = "" ;;
+    if(lockingState == NO_SIGNAL){
+      s = "No Docking Beacon Detected";
+    } else if (lockingState == BEACON_LOCKING){
+       s = "locking onto beacon..";
+    } else if (lockingState == BEACON_LOCKED){
+     
       s = "LOCKED to beacon";
     }
+    
     text(s, 46, 710);
+    
+    //speed calcs
+    speedWarning = false;
+    if(distance < 15 && shipState.shipVelocity > 15){
+      speedWarning = true;
+    }
+    
+    if(speedWarning && lastSpeedWarning + 2000 < millis()){
+      lastSpeedWarning = millis();
+      consoleAudio.playClip("reduceSpeed");
+    }
+      
+    
+    
   }
 
 
