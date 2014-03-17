@@ -121,7 +121,8 @@ void setup() {
   displayMap.put("hyperspace", warpDisplay);
   displayMap.put("selfdestruct", new DestructDisplay());
   displayMap.put("pwned", new PwnedDisplay());
-  currentScreen = radarDisplay;
+  displayMap.put("dockingtest", new DockingDisplay());
+  currentScreen = displayMap.get("dockingtest");
   ;
 
   bootDisplay = new BootDisplay();
