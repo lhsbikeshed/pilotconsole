@@ -57,7 +57,7 @@ String[] messageMapping = {
   "/system/jump/state", 
   "/system/propulsion/state", 
   "/system/misc/blastShield", 
-  "/system/misc/extlight", 
+  "/scene/launchland/dockingCompState", 
   "/system/undercarriage/state", 
   "/system/jump/doJump"
 };

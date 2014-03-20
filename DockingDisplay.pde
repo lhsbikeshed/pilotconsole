@@ -8,17 +8,17 @@ public class DockingDisplay implements Display {
   boolean landed = false;
   boolean clamped = true;
   boolean bayGravity = true;
-  
-  
+
+
   public static final int NO_SIGNAL = 0;
   public static final int BEACON_LOCKING = 1;
   public static final int BEACON_LOCKED = 2;
   int lockingState = NO_SIGNAL;
-  
+
   boolean speedWarning = false;
   long lastSpeedWarning = 0;
-  
-  
+
+
   int undercarriageState = 1;
   private String[] undercarriageStrings = {
     "up", "down", "Lowering..", "Raising.."
@@ -60,37 +60,38 @@ public class DockingDisplay implements Display {
       lastShipPos.x = shipPos.x; 
       lastShipPos.y = shipPos.y; 
       lastShipPos.z = shipPos.z;
-      
+
       distance = theOscMessage.get(4).floatValue(); 
-      
-      
+
+
       lastPosUpdate = millis();
 
       shipPos.x = theOscMessage.get(0).floatValue();
       shipPos.y = theOscMessage.get(1).floatValue();
       shipPos.z = theOscMessage.get(2).floatValue();
-      
+      println(shipPos);
+
       //signal locking events
       int newLockingState = theOscMessage.get(5).intValue() ;
-      if(lockingState != newLockingState){
-        if(newLockingState == NO_SIGNAL){
+      if (lockingState != newLockingState) {
+        if (newLockingState == NO_SIGNAL) {
           consoleAudio.playClip("signalLost");
-        } else if (newLockingState == BEACON_LOCKING){
+        } 
+        else if (newLockingState == BEACON_LOCKING) {
           consoleAudio.playClip("searchingBeacon");
-        } else if( newLockingState == BEACON_LOCKED){
+        } 
+        else if ( newLockingState == BEACON_LOCKED) {
           consoleAudio.playClip("signalAcquire");
         }
       }
-      
+
       lockingState = newLockingState;
-      
     }
   }
 
 
   public void start() {
     lockingState = NO_SIGNAL;
-    
   }
   public void stop()
   {
@@ -120,22 +121,22 @@ public class DockingDisplay implements Display {
       ellipse(width/2, height/2, i * 150, i * 150);
     }
 
-      if(lockingState != NO_SIGNAL){
+    if (lockingState != NO_SIGNAL) {
       pushMatrix();
-  
+
       PVector lerpPos = new PVector(0, 0, 0);
       lerpPos.x = lerp(lastShipPos.x, shipPos.x, (millis() - lastPosUpdate) / 200.0f);
       lerpPos.y = lerp(lastShipPos.y, shipPos.y, (millis() - lastPosUpdate) / 200.0f);
-  
-      int screenX = (int)map(lerpPos.x, 4.0, -4.0, 0, width);
-      int screenY = (int)map(lerpPos.y, 4.0, -4.0, 0, height);
-  
-  
+
+      int screenX = (int)map(lerpPos.x, 45.0, -45.0, 0, width);
+      int screenY = (int)map(lerpPos.y, 45.0, -45.0, 0, height);
+
+
       translate(screenX, screenY);
       //ship
       strokeWeight(5);
       noFill();
-  
+
       //calc colour
       float d = abs(lerpPos.mag());
       if ( d < 0.5) {
@@ -151,42 +152,49 @@ public class DockingDisplay implements Display {
       strokeWeight(2);
       line(-50, -50, 50, 50);
       line(-50, 50, 50, -50);
-  
-  
+
+
       popMatrix();
-    } else {
+    } 
+    else {
       textFont(font, 48);
       text("NO SIGNAL", 322, 401);
     }
     textFont(font, 30);
     text(distance, 46, 740);
     text("Speed: " + (int)shipState.shipVelocity, 58, 183);
-  
-    String s = "" ;;
-    if(lockingState == NO_SIGNAL){
+
+    String s = "" ;
+    ;
+    if (lockingState == NO_SIGNAL) {
       s = "No Docking Beacon Detected";
-    } else if (lockingState == BEACON_LOCKING){
-       s = "locking onto beacon..";
-    } else if (lockingState == BEACON_LOCKED){
-     
+    } 
+    else if (lockingState == BEACON_LOCKING) {
+      s = "locking onto beacon..";
+    } 
+    else if (lockingState == BEACON_LOCKED) {
+
       s = "LOCKED to beacon";
     }
-    
+
     text(s, 46, 710);
-    
+
     //speed calcs
     speedWarning = false;
-    if(distance < 15 && shipState.shipVelocity > 15){
+    if (distance < 250 && shipState.shipVelocity > 35) {
+      speedWarning = true;
+    } 
+    else if (distance < 150 && shipState.shipVelocity > 20) {
       speedWarning = true;
     }
-    
-    if(speedWarning && lastSpeedWarning + 2000 < millis()){
+    else if (distance < 80 && shipState.shipVelocity > 10) {
+      speedWarning = true;
+    }
+
+    if (speedWarning && lastSpeedWarning + 2000 < millis()) {
       lastSpeedWarning = millis();
       consoleAudio.playClip("reduceSpeed");
     }
-      
-    
-    
   }
 
 
