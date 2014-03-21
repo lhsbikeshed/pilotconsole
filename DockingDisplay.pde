@@ -179,21 +179,28 @@ public class DockingDisplay implements Display {
 
     text(s, 46, 710);
 
-    //speed calcs
-    speedWarning = false;
-    if (distance < 250 && shipState.shipVelocity > 35) {
-      speedWarning = true;
-    } 
-    else if (distance < 150 && shipState.shipVelocity > 20) {
-      speedWarning = true;
-    }
-    else if (distance < 80 && shipState.shipVelocity > 10) {
-      speedWarning = true;
-    }
-
-    if (speedWarning && lastSpeedWarning + 2000 < millis()) {
-      lastSpeedWarning = millis();
-      consoleAudio.playClip("reduceSpeed");
+    if(lockingState != NO_SIGNAL){
+      //speed calcs
+      speedWarning = false;
+      if (distance < 250 && shipState.shipVelocity > 35) {
+        speedWarning = true;
+      } 
+      else if (distance < 150 && shipState.shipVelocity > 20) {
+        speedWarning = true;
+      }
+      else if (distance < 80 && shipState.shipVelocity > 10) {
+        speedWarning = true;
+      }
+  
+      if (speedWarning && lastSpeedWarning + 2000 < millis()) {
+        lastSpeedWarning = millis();
+        consoleAudio.playClip("reduceSpeed");
+      }
+    } else {
+      if (speedWarning && lastSpeedWarning + 2000 < millis()) {
+        lastSpeedWarning = millis();
+        consoleAudio.playClip("searchingBeacon");
+      }
     }
   }
 
