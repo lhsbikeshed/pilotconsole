@@ -197,7 +197,7 @@ public class DockingDisplay implements Display {
         consoleAudio.playClip("reduceSpeed");
       }
     } else {
-      if (speedWarning && lastSpeedWarning + 2000 < millis()) {
+      if (lastSpeedWarning + 5000 < millis()) {
         lastSpeedWarning = millis();
         consoleAudio.playClip("searchingBeacon");
       }
