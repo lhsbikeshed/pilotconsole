@@ -1,6 +1,6 @@
 public class DockingDisplay implements Display {
 
-  PImage bgImage;
+  PImage bgImage, overlayImage;
 
   PImage shipImg, feetImg;
   //22
@@ -19,6 +19,13 @@ public class DockingDisplay implements Display {
   long lastSpeedWarning = 0;
 
 
+  int[][] warningSpeeds = { { 40, 8 },
+                            { 80, 10 }, 
+                            { 150,20 },
+                            { 350,35 }};
+                           //distance, speed 
+
+
   int undercarriageState = 1;
   private String[] undercarriageStrings = {
     "up", "down", "Lowering..", "Raising.."
@@ -32,13 +39,14 @@ public class DockingDisplay implements Display {
   float lastRotation = 0;
   //bay img is 600x300, 95,370
 
-    float iconScale = 0.3f;
+  float distanceScale = 0.9f;
   float distance = 100.0f;
 
   public DockingDisplay() {
     bgImage = loadImage("launchdisplay.png");
     shipImg = loadImage("shipbehind.png");
     feetImg = loadImage("shipfeet.png");
+    overlayImage = loadImage("dockingOverlay.png");
   }
 
 
@@ -97,11 +105,14 @@ public class DockingDisplay implements Display {
   {
   }
   public void draw() {
-
+    distanceScale = map(distance, 0, 350, 0.5f, 4.0f);
+    
+    
     background(0, 0, 0);
+    image(overlayImage, 8, 7);
     stroke(255);
     strokeWeight(1);
-    line(width/2, 0, width/2, height);
+    line(width/2, 85, width/2, height);
     line(0, height/2, width, height/2);
 
 
@@ -133,6 +144,7 @@ public class DockingDisplay implements Display {
 
 
       translate(screenX, screenY);
+      scale(distanceScale);
       //ship
       strokeWeight(5);
       noFill();
@@ -161,7 +173,7 @@ public class DockingDisplay implements Display {
       text("NO SIGNAL", 322, 401);
     }
     textFont(font, 30);
-    text(distance, 46, 740);
+    text("Range: " + distance, 46, 740);
     text("Speed: " + (int)shipState.shipVelocity, 58, 183);
 
     String s = "" ;
@@ -180,18 +192,20 @@ public class DockingDisplay implements Display {
     text(s, 46, 710);
 
     if(lockingState != NO_SIGNAL){
-      //speed calcs
       speedWarning = false;
-      if (distance < 250 && shipState.shipVelocity > 35) {
-        speedWarning = true;
-      } 
-      else if (distance < 150 && shipState.shipVelocity > 20) {
-        speedWarning = true;
+      int maxSpd = 0;
+      for(int i = warningSpeeds.length - 1; i > 0 ; i--){
+        int[] distSpeeds = warningSpeeds[i];
+        if( distance < distSpeeds[0] ){
+          
+          maxSpd = distSpeeds[1];
+          if(shipState.shipVelocity > distSpeeds[1]){
+            speedWarning = true;
+            break;
+          }
+        }
       }
-      else if (distance < 80 && shipState.shipVelocity > 10) {
-        speedWarning = true;
-      }
-  
+      text("Max Speed: " + maxSpd, 44, 678);
       if (speedWarning && lastSpeedWarning + 2000 < millis()) {
         lastSpeedWarning = millis();
         consoleAudio.playClip("reduceSpeed");
