@@ -139,10 +139,10 @@ public class DockingDisplay implements Display {
 
       //calc colour
       float d = abs(lerpPos.mag());
-      if ( d < 0.5) {
+      if ( d < 3) {
         stroke(0, 255, 0);
       } 
-      else if (d < 1.5) {
+      else if (d < 6.0) {
         stroke(255, 255, 0);
       } 
       else {

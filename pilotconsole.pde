@@ -36,7 +36,8 @@ NetAddress myRemoteLocation;
 
 //---joystick class
 Joystick joy;
-
+boolean autopilotBanner = false;
+PImage autopilotOverlay;
 
 long deathTime = 0;  //what time did we die?
 
@@ -140,6 +141,8 @@ void setup() {
   //consoleAudio.playClip("bannerPopup");
   //consoleAudio.playClip("newTarget");
 
+  autopilotOverlay = loadImage("autopilotoverlay.png");
+
   /*sync to current game screen*/
   OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
   oscP5.send(myMessage, myRemoteLocation);
@@ -207,6 +210,9 @@ void draw() {
       }
     }
     bannerSystem.draw();
+    if(autopilotBanner){
+      image(autopilotOverlay, 244, 594);
+    }
   }
 
   if (heartBeatTimer > 0) {
@@ -309,13 +315,10 @@ void oscEvent(OscMessage theOscMessage) {
     joy.setEnabled (state);
     println("Set control state : " + state);
     if (state == false) {
-      bannerSystem.setSize(700, 200);
-      bannerSystem.setTitle("NOTICE");
-      bannerSystem.setText("AUTOPILOT ENGAGED\r\n CONTROLS DISABLED");
-      bannerSystem.displayFor(36000000);
+      autopilotBanner = true;
     } 
     else {
-      bannerSystem.cancel();
+      autopilotBanner = false;
     }
   }
   else if (theOscMessage.checkAddrPattern("/pilot/powerState") == true) {
