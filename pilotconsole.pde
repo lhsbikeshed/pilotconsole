@@ -105,7 +105,7 @@ void setup() {
   }
 
 
-  
+
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress(serverIP, 12000);
   dropDisplay = new DropDisplay();
@@ -195,6 +195,10 @@ void draw() {
       //displayList[currentDisplay].draw();
 
       currentScreen.draw();
+      bannerSystem.draw();
+      if (autopilotBanner) {
+        image(autopilotOverlay, 244, 594);
+      }
     } 
     else {
       if (shipState.poweringOn) {
@@ -208,10 +212,6 @@ void draw() {
           oscP5.send(myMessage, new NetAddress(serverIP, 12000));
         }
       }
-    }
-    bannerSystem.draw();
-    if(autopilotBanner){
-      image(autopilotOverlay, 244, 594);
     }
   }
 
@@ -434,7 +434,7 @@ void dealWithSerial(String vals) {
 void mouseClicked() {
   println (":" + mouseX + "," + mouseY);
 }
-void hideCursor(){
+void hideCursor() {
   BufferedImage cursorImg = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
   Cursor blankCursor = Toolkit.getDefaultToolkit().createCustomCursor(
   cursorImg, new Point(0, 0), "blank cursor");
@@ -455,7 +455,7 @@ public class ShipState {
 
   public float shipVelocity = 0;
   public float lastShipVel = 0;
-  
+
   public long lastVelocityUpdate = 0;
 
   public ShipState() {
