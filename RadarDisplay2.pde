@@ -9,6 +9,7 @@ public class RadarDisplay2 implements Display {
   int propulsionPower = 2;
   RadarObject targetted;
   float zoomLevel = 0.1f;
+  float maxDist = 0.0f;
 
   //HashMap radarList = new HashMap();
 
@@ -118,11 +119,15 @@ public class RadarDisplay2 implements Display {
     strokeWeight(1);
     stroke(0, 0, 0);
 
+    //use this to calculate which target is most distant from the ship, scale the zoom level based on this
 
     fill(255, 255, 0, 255);
     sphere(1);
     fill(0, 0, 255);
+    zoomLevel = map(maxDist, 0, 5000, 0.8, 0.2);
     scale(zoomLevel);
+    // println(zoomLevel);
+    maxDist = 0;
     synchronized(lock) {
       for (int i = 0; i < 100; i++) {
 
@@ -135,6 +140,10 @@ public class RadarDisplay2 implements Display {
           newPos.x = lerp(rItem.lastPosition.x, rItem.position.x, (millis() - rItem.lastUpdateTime) / 250.0f );
           newPos.y = lerp(rItem.lastPosition.y, rItem.position.y, (millis() - rItem.lastUpdateTime) / 250.0f);
           newPos.z = lerp(rItem.lastPosition.z, rItem.position.z, (millis() - rItem.lastUpdateTime) / 250.0f);
+          float d = newPos.mag();
+          if (d > maxDist) {
+            maxDist = d;
+          }
           stroke(0, 255, 0);
           //line to base
           //line(-r.position.x, 0, r.position.z, -r.position.x, -r.position.y, r.position.z);
@@ -160,7 +169,7 @@ public class RadarDisplay2 implements Display {
           int alpha = (int)lerp(255, 0, (millis() - rItem.lastUpdateTime) / 250.0f);
           color c = rItem.displayColor;
           fill (c);
-          
+
 
           //sphere(10);
           if (newPos.y >= 0) {
@@ -214,6 +223,23 @@ public class RadarDisplay2 implements Display {
             stroke(255, 255, 0);
             line(660, 190, rItem.screenPos.x + midX, 190);
             line(rItem.screenPos.x + midX, 190, rItem.screenPos.x, rItem.screenPos.y);
+          }
+
+          //if this target is "pinging" then draw a radiobeacon highlight
+          Float f = rItem.getStat("pinging");
+          noStroke();
+          //strokeWeight(2.0);
+          //stroke(255,255,0);
+          if (f != null && f > 0.0) {
+            int radius = (int)map(millis() % 3000, 0, 3000, 0, 100);
+            int alpha = (int)map(millis() % 3000, 0, 3000, 255, 0);
+            fill(255, 255, 0, alpha);
+            ellipse(rItem.screenPos.x, rItem.screenPos.y, radius, radius);
+
+            radius = (int)map((millis() + 1500) % 3000, 0, 3000, 0, 100);
+            alpha = (int)map((millis() + 1500)  % 3000, 0, 3000, 255, 0);
+            fill(255, 255, 0, alpha);
+            ellipse(rItem.screenPos.x, rItem.screenPos.y, radius, radius);
           }
         }
       }
@@ -292,6 +318,8 @@ public class RadarDisplay2 implements Display {
 
   public void drawAxis(int highlight) {
     translate(width/2, height/2);
+   // pushMatrix();
+    //scale(zoomLevel * 2.0);
     rotateX(radians(345)); //326
     // rotateY(radians(225)); //216
     rotateY(radians(180));
@@ -327,6 +355,7 @@ public class RadarDisplay2 implements Display {
     line(-10, 0, 1000, 10, 0, 1000);
 
     stroke(0, 128, 0);
+  //  popMatrix();
   }
 
   void drawRadarCircle( int num, int sizing, int highlight) {
@@ -360,13 +389,14 @@ public class RadarDisplay2 implements Display {
         if (rId == -1) {
           rId = getNewRadarItem();
           println("new item : " + rId + " - " + id);
-          if(theOscMessage.get(1).stringValue().equals("INCOMING DEBRIS")){
+          if (theOscMessage.get(1).stringValue().equals("INCOMING DEBRIS")) {
             consoleAudio.playClip("collisionAlert");
-          } else {
-            
+          } 
+          else {
+
             consoleAudio.playClip("newTarget");
           }
-          
+
           newItem = true;
         }        
 
@@ -402,16 +432,14 @@ public class RadarDisplay2 implements Display {
 
         radarList[rId].statusText = theOscMessage.get(6).stringValue();
         radarList[rId].targetted = theOscMessage.get(7).intValue() == 1 ? true : false;
-        
+
         //now unpack the stat string
         String statString = theOscMessage.get(8).stringValue();
         String[] pairs = statString.split(",");
-        for(String p : pairs){          
+        for (String p : pairs) {          
           String[] vals = p.split(":");
           radarList[rId].setStat(vals[0], Float.parseFloat(vals[1]));
-          
         }
-        
       }
     } 
     else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {
