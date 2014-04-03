@@ -160,6 +160,7 @@ public class RadarDisplay2 implements Display {
           int alpha = (int)lerp(255, 0, (millis() - rItem.lastUpdateTime) / 250.0f);
           color c = rItem.displayColor;
           fill (c);
+          
 
           //sphere(10);
           if (newPos.y >= 0) {
@@ -378,6 +379,7 @@ public class RadarDisplay2 implements Display {
           radarList[rId].lastPosition.x = theOscMessage.get(2).floatValue();
           radarList[rId].lastPosition.y = theOscMessage.get(3).floatValue();
           radarList[rId].lastPosition.z = theOscMessage.get(4).floatValue();
+          radarList[rId].clearStats();
         } 
         else {
           radarList[rId].lastPosition.x = radarList[rId].position.x;
@@ -400,6 +402,16 @@ public class RadarDisplay2 implements Display {
 
         radarList[rId].statusText = theOscMessage.get(6).stringValue();
         radarList[rId].targetted = theOscMessage.get(7).intValue() == 1 ? true : false;
+        
+        //now unpack the stat string
+        String statString = theOscMessage.get(8).stringValue();
+        String[] pairs = statString.split(",");
+        for(String p : pairs){          
+          String[] vals = p.split(":");
+          radarList[rId].setStat(vals[0], Float.parseFloat(vals[1]));
+          
+        }
+        
       }
     } 
     else if (theOscMessage.checkAddrPattern("/control/subsystemstate") == true) {

@@ -15,7 +15,24 @@ public class RadarObject {
   public color displayColor = color(0,255,0);
   
   public long lastUpdateTime = 0;
+  protected HashMap<String, Float> statMap = new HashMap<String, Float>();
 
-  public RadarObject(){}
+  public RadarObject(){
+  
+  }
+  public void clearStats(){
+    statMap.clear();
+  }
+  
+  public void setStat(String name, float val){
+    Float f = new Float(val);
+   // println("setting stat: " + name);
+    statMap.put(name, val);
+  }
+  
+  public Float getStat(String name){
+    Float f = statMap.get(name);
+    return f;
+  }
 }
 
