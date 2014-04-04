@@ -128,6 +128,7 @@ public class RadarDisplay2 implements Display {
     scale(zoomLevel);
     // println(zoomLevel);
     maxDist = 0;
+    float distanceToShip = 0;
     synchronized(lock) {
       for (int i = 0; i < 100; i++) {
 
@@ -140,10 +141,20 @@ public class RadarDisplay2 implements Display {
           newPos.x = lerp(rItem.lastPosition.x, rItem.position.x, (millis() - rItem.lastUpdateTime) / 250.0f );
           newPos.y = lerp(rItem.lastPosition.y, rItem.position.y, (millis() - rItem.lastUpdateTime) / 250.0f);
           newPos.z = lerp(rItem.lastPosition.z, rItem.position.z, (millis() - rItem.lastUpdateTime) / 250.0f);
-          float d = newPos.mag();
-          if (d > maxDist) {
-            maxDist = d;
+          
+          //check if this is the farthest target from the ship, used to calculate scaling
+          rItem.distance = newPos.mag();
+          if (rItem.distance > maxDist) {
+            maxDist = rItem.distance;
           }
+          
+          //add some random jiggle into the target if its too far away
+          if(rItem.distance > 1000){
+            newPos.x += random(-20, 20);
+            newPos.y += random(-20, 20);
+            newPos.z += random(-20, 20);
+          }
+          
           stroke(0, 255, 0);
           //line to base
           //line(-r.position.x, 0, r.position.z, -r.position.x, -r.position.y, r.position.z);
@@ -202,9 +213,21 @@ public class RadarDisplay2 implements Display {
 
         RadarObject rItem = radarList[i];
         if (rItem.active) {
-          fill(rItem.displayColor);
+          
           textFont(font, 13);
-          text(rItem.name, rItem.screenPos.x + 5, rItem.screenPos.y + 10);
+          
+          if(rItem.distance > 1000){
+            StringBuilder s = new StringBuilder(rItem.name);
+            for(int c = 0; c < (int)random(3,s.length()); c++){
+              s.setCharAt( (int)random(0, s.length()), (char)random(0, 255));
+            }
+              
+            fill(40);
+            text(s.toString(), rItem.screenPos.x + 5, rItem.screenPos.y + 10);
+          } else {
+            fill(rItem.displayColor);
+            text(rItem.name, rItem.screenPos.x + 5, rItem.screenPos.y + 10);
+          }
           // textFont(font, 10);
           // text(r.statusText,r.screenPos.x + 5, r.screenPos.y + 20);
 
