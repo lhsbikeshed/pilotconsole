@@ -81,9 +81,8 @@ BannerOverlay bannerSystem = new BannerOverlay();
 int systemPower = 2;
 long heartBeatTimer = -1;
 
-//---- damage things----
-int damageTimer = -1000;
-PImage noiseImage;
+//damage effects
+DamageEffect damageEffects;
 
 float lastOscTime = 0;
 
@@ -132,8 +131,11 @@ void setup() {
   font = loadFont("HanzelExtendedNormal-48.vlw");
 
 
-  noiseImage = loadImage("noise.png");
+  //damage stuff
+  damageEffects = new DamageEffect();
   setJumpLightState(false);
+
+
 
   //SOUND!
   minim = new Minim(this);
@@ -189,6 +191,7 @@ void draw() {
     }
   }   
   else {
+    damageEffects.startTransform();
     //run joystick->osc updates
     joy.update();
     if (shipState.poweredOn) {
@@ -213,6 +216,7 @@ void draw() {
         }
       }
     }
+   damageEffects.stopTransform();
   }
 
   if (heartBeatTimer > 0) {
@@ -226,12 +230,9 @@ void draw() {
     }
   }
 
+  damageEffects.draw();
 
-  if ( damageTimer + 1000 > millis()) {
-    if (random(10) > 3) {
-      image(noiseImage, 0, 0, width, height);
-    }
-  }
+ 
 }
 
 void setJumpLightState(boolean state) {
@@ -340,8 +341,8 @@ void oscEvent(OscMessage theOscMessage) {
     heartBeatTimer = millis();
   } 
   else if (theOscMessage.checkAddrPattern("/ship/damage")==true) {
-
-    damageTimer = millis();
+    damageEffects.startEffect(1000);
+   
   } 
   else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
     shipState.shipPos.x = theOscMessage.get(0).floatValue();
