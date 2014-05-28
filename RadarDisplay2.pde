@@ -65,6 +65,30 @@ public class RadarDisplay2 implements Display {
 
 
   public void drawGuides() {
+    pushMatrix();
+    translate(934, 645);
+    noFill();
+
+    stroke(255);
+    strokeWeight(2);
+    fill(0);
+    rect(-50, -50, 100, 130);
+    if (guideVector.mag() < 0.05f ) {
+      fill(0, 125, 0);
+    } 
+    if (!useGuides) {
+      fill(0);
+    }
+    ellipse(0, 0, 80, 80);
+    fill(255);
+    if (useGuides) {
+      line(0, 0, guideVector.x * 100.0f, guideVector.y * 100.0f);
+    }
+    textFont(font, 12);
+    fill(255);
+    text(" PILOT\r\nASSIST", -30, 55);
+    popMatrix();
+
     if (useGuides == false) { 
       return ;
     }
@@ -100,7 +124,9 @@ public class RadarDisplay2 implements Display {
       image(guideArrow, 0, 0);
     }
 
+
     popMatrix();
+
     noTint();
   }
 
@@ -141,20 +167,20 @@ public class RadarDisplay2 implements Display {
           newPos.x = lerp(rItem.lastPosition.x, rItem.position.x, (millis() - rItem.lastUpdateTime) / 250.0f );
           newPos.y = lerp(rItem.lastPosition.y, rItem.position.y, (millis() - rItem.lastUpdateTime) / 250.0f);
           newPos.z = lerp(rItem.lastPosition.z, rItem.position.z, (millis() - rItem.lastUpdateTime) / 250.0f);
-          
+
           //check if this is the farthest target from the ship, used to calculate scaling
           rItem.distance = newPos.mag();
           if (rItem.distance > maxDist) {
             maxDist = rItem.distance;
           }
-          
+
           //add some random jiggle into the target if its too far away
-          if(rItem.distance > 1000){
+          if (rItem.distance > 1000) {
             newPos.x += random(-20, 20);
             newPos.y += random(-20, 20);
             newPos.z += random(-20, 20);
           }
-          
+
           stroke(0, 255, 0);
           //line to base
           //line(-r.position.x, 0, r.position.z, -r.position.x, -r.position.y, r.position.z);
@@ -186,10 +212,11 @@ public class RadarDisplay2 implements Display {
           if (newPos.y >= 0) {
 
 
-            scale(1, -1);
+
             image(indicatorImage, -16, -16, 32, 32);
           } 
           else {
+            scale(1, -1);
             image(indicatorImage, -16, -16, 32, 32);
           }
           popMatrix();
@@ -213,18 +240,19 @@ public class RadarDisplay2 implements Display {
 
         RadarObject rItem = radarList[i];
         if (rItem.active) {
-          
+
           textFont(font, 13);
-          
-          if(rItem.distance > 1000){
+
+          if (rItem.distance > 1000) {
             StringBuilder s = new StringBuilder(rItem.name);
-            for(int c = 0; c < (int)random(3,s.length()); c++){
+            for (int c = 0; c < (int)random(3,s.length()); c++) {
               s.setCharAt( (int)random(0, s.length()), (char)random(0, 255));
             }
-              
+
             fill(40);
             text(s.toString(), rItem.screenPos.x + 5, rItem.screenPos.y + 10);
-          } else {
+          } 
+          else {
             fill(rItem.displayColor);
             text(rItem.name, rItem.screenPos.x + 5, rItem.screenPos.y + 10);
           }
@@ -303,8 +331,10 @@ public class RadarDisplay2 implements Display {
 
     textFont(font, 18);
     fill(0, 255, 255);
-    text("Sensor Power:" + (sensorPower * 33) + "%", 680, 600);
-    text("Propulsion Power:" + (propulsionPower * 33) + "%", 680, 630);
+
+
+    text("Sensor" + (sensorPower * 33) + "%", 680, 600);
+    text("Prop" + (propulsionPower * 33) + "%", 680, 630);
 
     text("speed: " + (int)shipState.shipVelocity, 680, 660);
 
@@ -341,7 +371,7 @@ public class RadarDisplay2 implements Display {
 
   public void drawAxis(int highlight) {
     translate(width/2, height/2);
-   // pushMatrix();
+    // pushMatrix();
     //scale(zoomLevel * 2.0);
     rotateX(radians(345)); //326
     // rotateY(radians(225)); //216
@@ -378,7 +408,7 @@ public class RadarDisplay2 implements Display {
     line(-10, 0, 1000, 10, 0, 1000);
 
     stroke(0, 128, 0);
-  //  popMatrix();
+    //  popMatrix();
   }
 
   void drawRadarCircle( int num, int sizing, int highlight) {
