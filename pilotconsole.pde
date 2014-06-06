@@ -68,8 +68,8 @@ String[] messageMapping = {
 Hashtable<String, Display> displayMap = new Hashtable<String, Display>();
 Display currentScreen;
 DropDisplay dropDisplay;
-WarpDisplay2 warpDisplay;
-RadarDisplay2 radarDisplay;
+WarpDisplay warpDisplay;
+RadarDisplay radarDisplay;
 BootDisplay bootDisplay;
 LaunchDisplay launchDisplay;
 
@@ -108,8 +108,8 @@ void setup() {
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress(serverIP, 12000);
   dropDisplay = new DropDisplay();
-  radarDisplay = new RadarDisplay2();
-  warpDisplay = new WarpDisplay2();
+  radarDisplay = new RadarDisplay();
+  warpDisplay = new WarpDisplay();
   launchDisplay = new LaunchDisplay();
 
   joy = new Joystick(oscP5, this, joystickTestMode);
@@ -120,7 +120,6 @@ void setup() {
   displayMap.put("docking", launchDisplay);
   displayMap.put("hyperspace", warpDisplay);
   displayMap.put("selfdestruct", new DestructDisplay());
-  displayMap.put("pwned", new PwnedDisplay());
   displayMap.put("dockingtest", new DockingDisplay());
   currentScreen = displayMap.get("dockingtest");
   ;

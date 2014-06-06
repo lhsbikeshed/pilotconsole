@@ -1,4 +1,4 @@
-public class WarpDisplay2 implements Display {
+public class WarpDisplay implements Display {
 
   PImage bgImage;
   PImage overlayImage;
@@ -37,7 +37,7 @@ public class WarpDisplay2 implements Display {
   int planetX;
   float planetScale = 0.6f;
 
-  public WarpDisplay2() {
+  public WarpDisplay() {
     bgImage = loadImage("hyperspace2.png");
     overlayImage = loadImage("hyperfailoverlay.png");
     shipIcon = loadImage("hyperShipIcon.png");

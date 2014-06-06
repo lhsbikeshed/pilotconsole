@@ -1,7 +1,7 @@
 import java.util.Iterator;
 import java.util.Map;
 
-public class RadarDisplay2 implements Display {
+public class RadarDisplay implements Display {
   PFont font;
   Object lock = new Object();
   PImage overlayImage, indicatorImage;
@@ -24,7 +24,7 @@ public class RadarDisplay2 implements Display {
 
   int sectorX, sectorY, sectorZ;
 
-  public RadarDisplay2() {
+  public RadarDisplay() {
     font = loadFont("HanzelExtendedNormal-48.vlw");
     overlayImage = loadImage("overlayImage.png");
     indicatorImage = loadImage("indicator.png");
