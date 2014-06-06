@@ -160,7 +160,7 @@ void changeDisplay(Display d) {
 void draw() {
   noSmooth();
   float s = shipState.shipVel.mag();
-  shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - shipState.lastVelocityUpdate) / 250.0f);
+  shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - shipState.lastTransformUpdate) / 250.0f);
   if (!testMode) {
     while (serialPort.available () > 0) {
       char val = serialPort.readChar();
@@ -347,17 +347,23 @@ void oscEvent(OscMessage theOscMessage) {
     shipState.shipPos.x = theOscMessage.get(0).floatValue();
     shipState.shipPos.y = theOscMessage.get(1).floatValue();
     shipState.shipPos.z = theOscMessage.get(2).floatValue();
-
+/*
     shipState.shipRot.x = theOscMessage.get(3).floatValue();
     shipState.shipRot.y = theOscMessage.get(4).floatValue();
     shipState.shipRot.z = theOscMessage.get(5).floatValue();
-
-    shipState.shipVel.x = theOscMessage.get(6).floatValue();
-    shipState.shipVel.y = theOscMessage.get(7).floatValue();
-    shipState.shipVel.z = theOscMessage.get(8).floatValue();
+    */
+    float w = theOscMessage.get(3).floatValue();
+    float x = theOscMessage.get(4).floatValue();
+    float y = theOscMessage.get(5).floatValue();
+    float z = theOscMessage.get(6).floatValue();
+    shipState.lastShipRot = shipState.shipRot;
+    shipState.shipRot = new Rot(w,x,y,z, false);
+    shipState.shipVel.x = theOscMessage.get(7).floatValue();
+    shipState.shipVel.y = theOscMessage.get(8).floatValue();
+    shipState.shipVel.z = theOscMessage.get(9).floatValue();
 
     shipState.lastShipVel = shipState.shipVelocity;
-    shipState.lastVelocityUpdate = millis();
+    shipState.lastTransformUpdate = millis();
   } 
   else if ( theOscMessage.checkAddrPattern("/clientscreen/PilotStation/changeTo") ) {
     String changeTo = theOscMessage.get(0).stringValue();
@@ -450,13 +456,15 @@ public class ShipState {
   public boolean jumpState = false;
 
   public PVector shipPos = new PVector(0, 0, 0);
-  public PVector shipRot = new PVector(0, 0, 0);
+  public Rot shipRot = Rot.IDENTITY;
+  public Rot lastShipRot = Rot.IDENTITY;
   public PVector shipVel = new PVector(0, 0, 0);
 
   public float shipVelocity = 0;
   public float lastShipVel = 0;
 
-  public long lastVelocityUpdate = 0;
+  public long lastTransformUpdate = 0;
+  
 
   public ShipState() {
   };

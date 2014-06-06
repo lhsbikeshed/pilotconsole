@@ -24,6 +24,9 @@ public class RadarDisplay implements Display {
 
   int sectorX, sectorY, sectorZ;
 
+  Rot backgroundRotation = Rot.IDENTITY;
+
+
   public RadarDisplay() {
     font = loadFont("HanzelExtendedNormal-48.vlw");
     overlayImage = loadImage("overlayImage.png");
@@ -134,14 +137,34 @@ public class RadarDisplay implements Display {
   public void drawRadar() {
 
     pushMatrix();
-    // ortho();
+   
     lights();
     ambientLight(255, 255, 255);
     noTint();
-
+    //move the camera  --------------------------------------
+    translate(width/2, height/2);
+    rotateX(radians(345)); //326
+    rotateY(radians(180));
+    
     drawAxis((int)((millis() % 1750.0f) / 200));
-
-
+  
+    //draw the background cube ------------------------------
+    box(10);
+    pushMatrix();
+    Rot newRot = Rot.slerp( shipState.lastShipRot, shipState.shipRot, (millis() - shipState.lastTransformUpdate ) / 250.0f, false);
+    float[] ang = newRot.getAngles(RotOrder.XYZ);
+    rotateX(-ang[0]);
+    rotateY(-ang[1]);
+    rotateZ(ang[2]);
+//noFill();
+    strokeWeight(2);
+    stroke(20,20,20);
+    fill(12,30,15);
+    box(1500);
+   
+    popMatrix();
+    
+    //main radar
     strokeWeight(1);
     stroke(0, 0, 0);
 
@@ -150,7 +173,7 @@ public class RadarDisplay implements Display {
     fill(255, 255, 0, 255);
     sphere(1);
     fill(0, 0, 255);
-    zoomLevel = map(maxDist, 0, 5000, 0.8, 0.2);
+    zoomLevel = map(maxDist, 0, 5000, 1.8, 0.2);
     scale(zoomLevel);
     // println(zoomLevel);
     maxDist = 0;
@@ -370,12 +393,7 @@ public class RadarDisplay implements Display {
 
 
   public void drawAxis(int highlight) {
-    translate(width/2, height/2);
-    // pushMatrix();
-    //scale(zoomLevel * 2.0);
-    rotateX(radians(345)); //326
-    // rotateY(radians(225)); //216
-    rotateY(radians(180));
+    
     //x axis
     stroke(128, 0, 0);
     strokeWeight(1);
@@ -391,12 +409,12 @@ public class RadarDisplay implements Display {
     strokeWeight(1);
     drawRadarCircle(5, 200, highlight);
 
-    for (int delay = 0; delay < 5; delay++) {
-
-      float radius = ((millis()  + (delay*1000 )) / 5.0f) % 1000 ;
-      stroke(0, 255, 0, map(radius, 0, 1000, 255, 0));
-      ellipse(0, 0, radius, radius);
-    }  
+//    for (int delay = 0; delay < 5; delay++) {
+//
+//      float radius = ((millis()  + (delay*1000 )) / 5.0f) % 1000 ;
+//      stroke(0, 255, 0, map(radius, 0, 1000, 255, 0));
+//      ellipse(0, 0, radius, radius);
+//    }  
 
 
 

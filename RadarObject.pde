@@ -18,7 +18,7 @@ public class RadarObject {
   protected HashMap<String, Float> statMap = new HashMap<String, Float>();
 
   public RadarObject(){
-  
+   
   }
   public void clearStats(){
     statMap.clear();
