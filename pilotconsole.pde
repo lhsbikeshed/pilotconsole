@@ -72,6 +72,7 @@ WarpDisplay warpDisplay;
 RadarDisplay radarDisplay;
 BootDisplay bootDisplay;
 LaunchDisplay launchDisplay;
+CablePuzzleDisplay cablePuzzleDisplay;
 
 //---banner overlay class---
 BannerOverlay bannerSystem = new BannerOverlay();
@@ -121,7 +122,8 @@ void setup() {
   displayMap.put("hyperspace", warpDisplay);
   displayMap.put("selfdestruct", new DestructDisplay());
   displayMap.put("dockingtest", new DockingDisplay());
-  currentScreen = displayMap.get("dockingtest");
+  displayMap.put("cablepuzzle", new CablePuzzleDisplay());
+  currentScreen = displayMap.get("radar");
   ;
 
   bootDisplay = new BootDisplay();
@@ -422,7 +424,23 @@ void dealWithSerial(String vals) {
     }
     //map throttle to 0-1 float, set throttle
     joy.throttle = t;
-  } 
+  } else if (p == 'C' || p == 'c'){  //cable connection event
+    //C:<plug>:<socket>
+    OscMessage msg;
+    if(p == 'C'){
+      msg = new OscMessage("/system/cablePuzzle/connect");
+    } else {
+      msg = new OscMessage("/system/cablePuzzle/disconnect");
+    }
+    String[] parts = vals.split(":");
+    int pl = Integer.parseInt(parts[1]);
+    int s = Integer.parseInt(parts[2]);
+    msg.add(pl);
+    msg.add(s);
+    oscP5.send(msg, myRemoteLocation);
+    
+    
+  }
   else {
 
     int sw = Integer.parseInt("" + p);
