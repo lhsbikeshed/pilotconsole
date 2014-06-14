@@ -153,9 +153,11 @@ public class RadarDisplay implements Display {
     pushMatrix();
     Rot newRot = Rot.slerp( shipState.lastShipRot, shipState.shipRot, (millis() - shipState.lastTransformUpdate ) / 250.0f, false);
     float[] ang = newRot.getAngles(RotOrder.XYZ);
-    rotateX(-ang[0]);
-    rotateY(-ang[1]);
-    rotateZ(ang[2]);
+    if(ang != null){
+      rotateX(-ang[0]);
+      rotateY(-ang[1]);
+      rotateZ(ang[2]);
+    }
 //noFill();
     strokeWeight(2);
     stroke(20,20,20);
