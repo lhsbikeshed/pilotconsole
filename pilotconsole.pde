@@ -101,7 +101,7 @@ void setup() {
     joystickTestMode = false;
     shipState.poweredOn = false;
     frame.setLocation(0, 0);
-    serialPort = new Serial(this, "COM4", 115200);
+    serialPort = new Serial(this, "COM8", 115200);
   }
 
 
