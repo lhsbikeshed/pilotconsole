@@ -520,6 +520,8 @@ public class RadarDisplay implements Display {
 
       sensorPower = theOscMessage.get(2).intValue() ;
       propulsionPower = theOscMessage.get(0).intValue() ;
+    } else if (theOscMessage.checkAddrPattern("/radar/wayPointReached")){
+      consoleAudio.playClip("waypointReached");
     }
   }
 }
