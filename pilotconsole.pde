@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 //CHANGE ME
-boolean testMode = true;
+boolean testMode = false;
 
 
 
@@ -55,11 +55,11 @@ String lastSerial = "";
 
 // mappings from physical buttons to OSC messages
 String[] messageMapping = {  
-  "/system/jump/state", 
-  "/system/propulsion/state", 
-  "/system/misc/blastShield", 
-  "/scene/launchland/dockingCompState", 
   "/system/undercarriage/state", 
+  "/scene/launchland/dockingCompState", 
+  "/system/misc/blastShield", 
+  "/system/propulsion/state", 
+  "/system/jump/state", 
   "/system/jump/doJump"
 };
 
@@ -101,7 +101,7 @@ void setup() {
     joystickTestMode = false;
     shipState.poweredOn = false;
     frame.setLocation(0, 0);
-    serialPort = new Serial(this, "COM4", 115200);
+    serialPort = new Serial(this, "COM8", 115200);
   }
 
 
@@ -217,7 +217,7 @@ void draw() {
         }
       }
     }
-   damageEffects.stopTransform();
+    damageEffects.stopTransform();
   }
 
   if (heartBeatTimer > 0) {
@@ -232,8 +232,6 @@ void draw() {
   }
 
   damageEffects.draw();
-
- 
 }
 
 void setJumpLightState(boolean state) {
@@ -343,23 +341,22 @@ void oscEvent(OscMessage theOscMessage) {
   } 
   else if (theOscMessage.checkAddrPattern("/ship/damage")==true) {
     damageEffects.startEffect(1000);
-   
   } 
   else if (theOscMessage.checkAddrPattern("/ship/transform") == true) {
     shipState.shipPos.x = theOscMessage.get(0).floatValue();
     shipState.shipPos.y = theOscMessage.get(1).floatValue();
     shipState.shipPos.z = theOscMessage.get(2).floatValue();
-/*
+    /*
     shipState.shipRot.x = theOscMessage.get(3).floatValue();
-    shipState.shipRot.y = theOscMessage.get(4).floatValue();
-    shipState.shipRot.z = theOscMessage.get(5).floatValue();
-    */
+     shipState.shipRot.y = theOscMessage.get(4).floatValue();
+     shipState.shipRot.z = theOscMessage.get(5).floatValue();
+     */
     float w = theOscMessage.get(3).floatValue();
     float x = theOscMessage.get(4).floatValue();
     float y = theOscMessage.get(5).floatValue();
     float z = theOscMessage.get(6).floatValue();
     shipState.lastShipRot = shipState.shipRot;
-    shipState.shipRot = new Rot(w,x,y,z, false);
+    shipState.shipRot = new Rot(w, x, y, z, false);
     shipState.shipVel.x = theOscMessage.get(7).floatValue();
     shipState.shipVel.y = theOscMessage.get(8).floatValue();
     shipState.shipVel.z = theOscMessage.get(9).floatValue();
@@ -424,12 +421,14 @@ void dealWithSerial(String vals) {
     }
     //map throttle to 0-1 float, set throttle
     joy.throttle = t;
-  } else if (p == 'C' || p == 'c'){  //cable connection event
+  } 
+  else if (p == 'C' || p == 'c') {  //cable connection event
     //C:<plug>:<socket>
     OscMessage msg;
-    if(p == 'C'){
+    if (p == 'C') {
       msg = new OscMessage("/system/cablePuzzle/connect");
-    } else {
+    } 
+    else {
       msg = new OscMessage("/system/cablePuzzle/disconnect");
     }
     String[] parts = vals.split(":");
@@ -438,8 +437,6 @@ void dealWithSerial(String vals) {
     msg.add(pl);
     msg.add(s);
     oscP5.send(msg, myRemoteLocation);
-    
-    
   }
   else {
 
@@ -482,7 +479,7 @@ public class ShipState {
   public float lastShipVel = 0;
 
   public long lastTransformUpdate = 0;
-  
+
 
   public ShipState() {
   };

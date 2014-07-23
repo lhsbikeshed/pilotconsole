@@ -32,7 +32,7 @@ public class CablePuzzleDisplay implements Display {
     
   }
   public void stop(){
-    
+    joy.setEnabled(true);
   }
   
   public void draw(){
