@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 //CHANGE ME
-boolean testMode = true;
+boolean testMode = false;
 
 
 
@@ -447,6 +447,10 @@ void dealWithSerial(String vals) {
       return;
     }
     OscMessage myMessage = new OscMessage(messageMapping[sw]);
+    if(sw == 4){
+      //jump switch is now inverted
+      val = 1 - val;
+    }
     myMessage.add(val);
     oscP5.send(myMessage, myRemoteLocation);
   }
