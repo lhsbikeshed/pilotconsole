@@ -158,7 +158,7 @@ public class DropDisplay implements Display {
       fireVec.x = theOscMessage.get(7).floatValue();
       fireVec.y = theOscMessage.get(8).floatValue();
       fireVec.z = theOscMessage.get(9).floatValue();
-      println(fireVec.z);
+      
     } else if (theOscMessage.checkAddrPattern("/scene/drop/structuralFailure")==true) {
       structFail = true;
     } else if (theOscMessage.checkAddrPattern("/scene/drop/turbulenceWarning")){

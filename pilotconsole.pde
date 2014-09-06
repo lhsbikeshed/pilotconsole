@@ -45,7 +45,8 @@ ShipState shipState = new ShipState();  //container for ship data
 
 PFont font;  //default font for game
 
-
+boolean globalBlinker = false;
+long blinkTime = 0;
 
 //serial stuff
 Serial serialPort;
@@ -73,6 +74,7 @@ RadarDisplay radarDisplay;
 BootDisplay bootDisplay;
 LaunchDisplay launchDisplay;
 CablePuzzleDisplay cablePuzzleDisplay;
+FailureScreen failureScreen;
 
 //---banner overlay class---
 BannerOverlay bannerSystem = new BannerOverlay();
@@ -123,8 +125,9 @@ void setup() {
   displayMap.put("selfdestruct", new DestructDisplay());
   displayMap.put("dockingtest", new DockingDisplay());
   displayMap.put("cablepuzzle", new CablePuzzleDisplay());
-  currentScreen = displayMap.get("radar");
-  ;
+  displayMap.put("failureScreen", new FailureScreen());
+  
+  
 
   bootDisplay = new BootDisplay();
   displayMap.put("boot", bootDisplay);
@@ -149,17 +152,29 @@ void setup() {
   /*sync to current game screen*/
   OscMessage myMessage = new OscMessage("/game/Hello/PilotStation");  
   oscP5.send(myMessage, myRemoteLocation);
+  
+  //set initial screen
+  Display d = displayMap.get("radar");
+  changeDisplay(d);
+  
 }
 
 
 void changeDisplay(Display d) {
-  currentScreen.stop();
+  if(currentScreen != null){
+    currentScreen.stop();
+  }
   currentScreen = d;
   currentScreen.start();
 }
 
 
 void draw() {
+  if (blinkTime + 750 < millis()) {
+    blinkTime = millis();
+    globalBlinker = ! globalBlinker;
+  }
+  
   noSmooth();
   float s = shipState.shipVel.mag();
   shipState.shipVelocity = lerp(shipState.lastShipVel, s, (millis() - shipState.lastTransformUpdate) / 250.0f);
