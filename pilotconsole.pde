@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 //CHANGE ME
-boolean testMode = false;
+boolean testMode = true;
 
 
 
@@ -414,8 +414,10 @@ void oscEvent(OscMessage theOscMessage) {
     radarDisplay.setSector(   theOscMessage.get(0).intValue(), 
     theOscMessage.get(1).intValue(), 
     theOscMessage.get(2).intValue());
-  } 
-  else {
+  } else if (theOscMessage.checkAddrPattern("/ship/effect/playSound")){
+    String name = theOscMessage.get(0).stringValue();
+    consoleAudio.playClip(name);
+  } else {
     //displayList[currentDisplay].oscMessage(theOscMessage);
     currentScreen.oscMessage(theOscMessage);
   }

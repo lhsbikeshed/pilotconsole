@@ -358,8 +358,8 @@ public class RadarDisplay implements Display {
     fill(0, 255, 255);
 
 
-    text("Sensor" + (sensorPower * 33) + "%", 680, 600);
-    text("Prop" + (propulsionPower * 33) + "%", 680, 630);
+    
+    text("Prop: " + (propulsionPower * 33) +  "%", 680, 630);
 
     text("speed: " + (int)shipState.shipVelocity, 680, 660);
 
