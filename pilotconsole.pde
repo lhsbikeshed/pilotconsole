@@ -126,7 +126,7 @@ void setup() {
   displayMap.put("dockingtest", new DockingDisplay());
   displayMap.put("cablepuzzle", new CablePuzzleDisplay());
   displayMap.put("failureScreen", new FailureScreen());
-  
+  displayMap.put("restrictedArea", new RestrictedAreaScreen());
   
 
   bootDisplay = new BootDisplay();
